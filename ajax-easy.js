@@ -1,3 +1,4 @@
+
 (function ($){
     $.fn.findInputByName = function (name) {
         if(name.indexOf(".") == -1)
@@ -43,14 +44,14 @@
                     $.each(response.responseJSON, function(key, value) {
                         if (value.constructor === Array) {
                             for (x in value) {
-                                this_form.findInputByName(key).parent("div").append("<div class='text-danger'>" + value[x] + "</div>");
+                                this_form.findInputByName(key).parent("div").append("<div style='color:#d00606;'>" + value[x] + "</div>");
                                 if (count == 0) {
                                     this_form.findInputByName(key).focus();
                                     count++;
                                 }
                             }
                         } else {
-                            this_form.findInputByName(key).parent("div").append("<div class='text-danger'>" + value + "</div>");
+                            this_form.findInputByName(key).parent("div").append("<div style='color:#d00606;'>" + value + "</div>");
                             if (count == 0) {
                                 this_form.findInputByName(key).focus();
                                 count++;
