@@ -19,6 +19,9 @@
         config.get = function(property) {
             return property in this ? this[property] : null;
         };
+        if($(this).length!=1){
+            throw "please select exactly one element";
+        }
         if(!$(this).is("form")){
             throw "element is not a form";
         }
@@ -26,7 +29,7 @@
         this_form.submit(function(event){
 
             event.preventDefault();
-            this_form.find("div.text-danger").remove();
+            this_form.find("div.ajaxeasy-validationerrors").remove();
             disableSubmitButton(this_form, config.get("loading_txt"));
             var ajax_obj = {
                 url : this_form.prop("action"),
@@ -36,7 +39,29 @@
                 success : function (response) {
                     this_form.trigger("reset");
                     enableSubmitButton(this_form);
-                    config.get('ajax_success')(response);
+                    if(config.get('success_message')){
+                        $('<div/>', {
+                            'id': 'ajaxeasy-success-message'
+                        }).css({
+                                'background-color': 'green',
+                                'position': 'fixed',
+                                'bottom': '10%',
+                                'left': '50%',
+                                'transform': 'translateX(-50%)',
+                                'padding': '9px',
+                                'color': 'white',
+                                'border-radius': '3px',
+                                'display': 'block',
+                                'z-index': '9999',
+                        }).appendTo($('body')).text(config.get('success_message'));
+                        setTimeout(function(){
+                            $('#ajaxeasy-success-message').fadeOut('slow', 'linear', function(){
+                                $(this).remove();
+                            });
+                        },3000);
+                    }
+                    if(config.get('ajax_success'))
+                        config.get('ajax_success')(response);
                 },
                 error : function(response) {
                     enableSubmitButton(this_form);
@@ -44,14 +69,14 @@
                     $.each(response.responseJSON, function(key, value) {
                         if (value.constructor === Array) {
                             for (x in value) {
-                                this_form.findInputByName(key).parent("div").append("<div style='color:#d00606;'>" + value[x] + "</div>");
+                                this_form.findInputByName(key).parent("div").append("<div class='ajaxeasy-validationerrors' style='color:#d00606;'>" + value[x] + "</div>");
                                 if (count == 0) {
                                     this_form.findInputByName(key).focus();
                                     count++;
                                 }
                             }
                         } else {
-                            this_form.findInputByName(key).parent("div").append("<div style='color:#d00606;'>" + value + "</div>");
+                            this_form.findInputByName(key).parent("div").append("<div class='ajaxeasy-validationerrors' style='color:#d00606;'>" + value + "</div>");
                             if (count == 0) {
                                 this_form.findInputByName(key).focus();
                                 count++;
@@ -90,7 +115,7 @@ function enableSubmitButton(form_obj) {
         console.error("submit button not found.");
     }
 }
-function disableSubmitButton(form_obj, innertxt) {
+function disableSubmitButton(form_obj, innertxt) {dddd = form_obj;
     innertxt = innertxt === null ? "Loading..." : innertxt;
     var submit_button = form_obj.find("button[type='submit']");
     var submit_input  = form_obj.find("input[type='submit']");
