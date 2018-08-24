@@ -65,6 +65,9 @@
                 },
                 error : function(response) {
                     enableSubmitButton(this_form);
+                    if(response.errors!='undefined') {
+                        response = response.errors;
+                    }
                     var count = 0;
                     $.each(response.responseJSON, function(key, value) {
                         if (value.constructor === Array) {
