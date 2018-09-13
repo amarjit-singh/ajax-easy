@@ -65,7 +65,7 @@
                 },
                 error : function(response) {
                     enableSubmitButton(this_form);
-                    if(response.responseJSON.errors!='undefined') {
+                    if(typeof(response.responseJSON.errors)!='undefined') {
                         errors = response.responseJSON.errors;
                     } else {
                         errors = response.responseJSON;
@@ -73,12 +73,10 @@
                     var count = 0;
                     $.each(errors, function(key, value) {
                         if (value.constructor === Array) {
-                            for (x in value) {
-                                this_form.findInputByName(key).parent("div").append("<div class='ajaxeasy-validationerrors' style='color:#d00606;'>" + value[x] + "</div>");
-                                if (count == 0) {
-                                    this_form.findInputByName(key).focus();
-                                    count++;
-                                }
+                            this_form.findInputByName(key).parent("div").append("<div class='ajaxeasy-validationerrors' style='color:#d00606;'>" + value[0] + "</div>");
+                            if (count == 0) {
+                                this_form.findInputByName(key).focus();
+                                count++;
                             }
                         } else {
                             this_form.findInputByName(key).parent("div").append("<div class='ajaxeasy-validationerrors' style='color:#d00606;'>" + value + "</div>");
