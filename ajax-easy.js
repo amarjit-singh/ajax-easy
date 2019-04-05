@@ -1,4 +1,3 @@
-
 (function ($){
     $.fn.findInputByName = function (name) {
         if(name.indexOf(".") == -1)
@@ -66,9 +65,9 @@
                 error : function(response) {
                     enableSubmitButton(this_form);
                     if(typeof(response.responseJSON.errors)!='undefined') {
-                        errors = response.responseJSON.errors;
+                        var errors = response.responseJSON.errors;
                     } else {
-                        errors = response.responseJSON;
+                        var errors = response.responseJSON;
                     }
                     var count = 0;
                     $.each(errors, function(key, value) {
@@ -118,7 +117,7 @@ function enableSubmitButton(form_obj) {
         console.error("submit button not found.");
     }
 }
-function disableSubmitButton(form_obj, innertxt) {dddd = form_obj;
+function disableSubmitButton(form_obj, innertxt) {
     innertxt = innertxt === null ? "Loading..." : innertxt;
     var submit_button = form_obj.find("button[type='submit']");
     var submit_input  = form_obj.find("input[type='submit']");
