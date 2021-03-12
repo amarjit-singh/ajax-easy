@@ -1,17 +1,4 @@
 (function ($){
-    $.fn.findInputByName = function (name) {
-        if(name.indexOf(".") == -1)
-            return $(this).find(':input[name="'+ name +'"]');
-        else
-        {
-            var index = name.split(".")[1];
-            var name = name.split(".")[0];
-            return $(this).find(':input[name="'+ name +'[]"]').eq(index);
-        }
-    }
-})(jQuery);
-
-(function ($){
     $.fn.ajaxeasy = function (config) {
         if(typeof config === "undefined")
             config = {};
@@ -19,24 +6,22 @@
             return property in this ? this[property] : null;
         };
         if($(this).length!=1){
-            throw "please select exactly one element";
+            throw new Error("please select exactly one element");
         }
         if(!$(this).is("form")){
-            throw "element is not a form";
+            throw new Error("element is not a form");
         }
         var this_form = $(this);
         this_form.submit(function(event){
-
             event.preventDefault();
             this_form.find("div.ajaxeasy-validationerrors").remove();
             disableSubmitButton(this_form, config.get("loading_txt"));
             var ajax_obj = {
-                url : this_form.prop("action"),
+                url : config.get('ajax_url') ? config.get('ajax_url') : this_form.prop("action"),
                 method : this_form.prop("method"),
                 dataType : 'JSON',
                 data : this_form.serialize(),
                 success : function (response) {
-                    this_form.trigger("reset");
                     enableSubmitButton(this_form);
                     if(config.get('success_message')){
                         $('<div/>', {
@@ -61,6 +46,8 @@
                     }
                     if(config.get('ajax_success'))
                         config.get('ajax_success')(response);
+                    else
+                        this_form.trigger("reset");
                 },
                 error : function(response) {
                     enableSubmitButton(this_form);
@@ -71,7 +58,8 @@
                     }
                     var count = 0;
                     $.each(errors, function(key, value) {
-                        if(key.includes('.')) {
+                        if(key.includes("."))
+                        {
                             key = key.split('.');
                             var arrayPath = key[0];
                             for(var i = 1; i < key.length; i++) {
@@ -79,18 +67,16 @@
                             }
                             key = arrayPath;
                         }
-                        if (value.constructor === Array) {
-                            this_form.findInputByName(key).after("<div class='ajaxeasy-validationerrors' style='color:#d00606;'>" + value[0] + "</div>");
-                            if (count == 0) {
-                                this_form.findInputByName(key).focus();
-                                count++;
-                            }
+                        if (value.constructor === Array) value = value[0];
+                        var errorArea = this_form.find('div.ae-error[data-for="'+key+'"]');
+                        if(errorArea.length == 0) {
+                            this_form.find(':input[name="'+ key +'"]').first().after("<div class='ajaxeasy-validationerrors' style='color:#d00606;'>" + value + "</div>");
                         } else {
-                            this_form.findInputByName(key).after("<div class='ajaxeasy-validationerrors' style='color:#d00606;'>" + value + "</div>");
-                            if (count == 0) {
-                                this_form.findInputByName(key).focus();
-                                count++;
-                            }
+                            errorArea.append("<div class='ajaxeasy-validationerrors' style='color:#d00606;'>" + value + "</div>");
+                        }
+                        if (count == 0) {
+                            this_form.find(':input[name="'+ key +'"]').first().focus();
+                            count++;
                         }
                     });
                 }
